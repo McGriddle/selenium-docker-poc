@@ -1,0 +1,40 @@
+version: '3.1'
+services:
+  selenium-hub:
+    image: selenium/hub
+    restart: unless-stopped
+    networks:
+      app_net:
+        ipv4_address: 172.50.7.2
+    environment:
+     - GRID_BROWSER_TIMEOUT=180
+     - GRID_TIMEOUT=120
+    ports:
+     - 4444:4444
+  selenium-node-chrome:
+    image: selenium/node-chrome-debug
+    depends_on:
+     - selenium-hub
+    networks:
+      app_net:
+        ipv4_address: 172.50.7.3
+    environment:
+     - NODE_MAX_INSTANCES=5
+     - HUB_HOST=selenium-hub
+     - SCREEN_WIDTH=1920
+     - SCREEN_HEIGHT=1080
+     - SCREEN_DEPTH=24
+    ports:
+     - 5900:5900
+    volumes:
+     - /dev/shm:/dev/shm
+
+ 
+networks:
+  app_net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      -
+        subnet: 172.50.7.0/24
